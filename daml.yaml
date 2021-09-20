@@ -6,6 +6,8 @@ parties:
   - Alice
   - Bob
   - Floice
+  - Government
+  - John
 version: 0.0.1
 dependencies:
   - daml-prim

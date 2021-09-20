@@ -7,14 +7,14 @@ type LandSaleId = ContractId LandSale
 -- Land ownership
 template LandSale
     with 
+        gov : Party
         owner : Party
         lawyer : Party
-        newOwner : Party
         landName : Text
         value : Int
 
     where 
-    signatory owner
+    signatory gov
     observer lawyer
 
     controller owner can
@@ -34,15 +34,21 @@ setup = script do
     alice <- allocateParty "Alice"
     bob <- allocateParty "Bob"
     floice <- allocateParty "Floice"
+    gov <- allocateParty "Gov"
 
-    newLand <- submit alice do
+    john <- allocateParty "John"
+
+    newLand <- submit gov do
         createCmd LandSale with
+            gov = gov
             owner = alice
-            newOwner = bob
             lawyer = floice
             landName = "Land A"
             value = 100000
 
-    submit alice do
+    bobsLand <- submit alice do
         exerciseCmd newLand SellLandTo with buyer = bob, price = 120000
+
+    submit bob do
+        exerciseCmd bobsLand SellLandTo with buyer = john, price = 140000
 
