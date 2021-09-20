@@ -1,0 +1,47 @@
+module Main where
+
+import Daml.Script
+
+type LandSaleId = ContractId LandSale
+
+-- Land ownership
+template LandSale
+    with 
+        owner : Party
+        lawyer : Party
+        newOwner : Party
+        landName : Text
+        value : Int
+
+    where 
+    signatory owner
+    observer lawyer
+
+    controller owner can
+        SellLandTo : LandSaleId
+            with
+                price : Int
+                buyer : Party
+            do
+                create this with
+                    owner = buyer
+                    value = price
+
+-- Test
+setup : Script LandSaleId
+setup = script do
+    alice <- allocateParty "Alice"
+    bob <- allocateParty "Bob"
+    floice <- allocateParty "Floice"
+
+    newLand <- submit alice do
+        createCmd LandSale with
+            owner = alice
+            newOwner = bob
+            lawyer = floice
+            landName = "Land A"
+            value = 100000
+
+    submit alice do
+        exerciseCmd newLand SellLandTo with buyer = bob, price = 120000
+
