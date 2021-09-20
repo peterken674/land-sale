@@ -24,6 +24,7 @@ template LandSale
                 buyer : Party
             do
                 create this with
+                    -- Set the buyer to be the new owner
                     owner = buyer
                     value = price
 
